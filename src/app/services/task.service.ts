@@ -17,7 +17,7 @@ export interface Task {
   providedIn: 'root'
 })
 export class TaskService {
-  private http = inject(HttpClient);  // New way!
+  private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/tasks`;
 
   getTasks(): Observable<Task[]> {

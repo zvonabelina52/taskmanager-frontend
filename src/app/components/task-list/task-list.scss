@@ -1,3 +1,23 @@
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+
+  &:hover {
+    background: #5a6268;
+  }
+}
+
+.welcome {
+  margin: 0.5rem 0 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
 .task-manager {
   max-width: 1400px;
   margin: 0 auto;
@@ -252,5 +272,58 @@
 @media (max-width: 1024px) {
   .kanban-board {
     grid-template-columns: 1fr;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #666;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 1rem;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state-main {
+  text-align: center;
+  padding: 4rem 2rem;
+  margin: 2rem auto;
+  max-width: 500px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+    color: #666;
+    line-height: 1.6;
   }
 }

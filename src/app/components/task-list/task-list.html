@@ -1,17 +1,34 @@
 <div class="task-manager">
   <header class="header">
-    <h1>📋 Task Manager</h1>
-    <button class="btn btn-primary" (click)="toggleForm()">
-      {{ showForm ? 'Cancel' : '+ New Task' }}
-    </button>
+    <div>
+      <h1>📋 Task Manager</h1>
+      <p class="welcome">Welcome, {{ currentUser()?.username }}!</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="toggleForm()">
+        {{ showForm ? 'Cancel' : '+ New Task' }}
+      </button>
+      <button class="btn btn-secondary" (click)="logout()">
+        Logout
+      </button>
+    </div>
   </header>
 
   <div class="error" *ngIf="error">
     {{ error }}
   </div>
 
+  <!-- Loading State -->
   <div class="loading" *ngIf="loading">
-    Loading tasks...
+    <div class="spinner"></div>
+    <p>Loading your tasks...</p>
+  </div>
+
+  <!-- Empty State (when not loading and no tasks) -->
+  <div class="empty-state-main" *ngIf="!loading && tasks.length === 0 && !showForm">
+    <div class="empty-icon">📝</div>
+    <h2>No tasks yet!</h2>
+    <p>You don't have any tasks. Create one by clicking the "New Task" button above.</p>
   </div>
 
   <!-- New Task Form -->
@@ -67,8 +84,8 @@
     </form>
   </div>
 
-  <!-- Kanban Board -->
-  <div class="kanban-board" *ngIf="!loading">
+  <!-- Kanban Board (only show when not loading and has tasks) -->
+  <div class="kanban-board" *ngIf="!loading && tasks.length > 0">
     <div class="kanban-column">
       <h3 class="column-header todo">📝 To Do ({{ getTasksByStatus('TODO').length }})</h3>
       <div class="tasks">

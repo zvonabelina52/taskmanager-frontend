@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService, Task } from '../../services/task.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-task-list',
@@ -12,6 +13,9 @@ import { TaskService, Task } from '../../services/task.service';
 })
 export class TaskListComponent implements OnInit {
   private taskService = inject(TaskService);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
+  currentUser = this.authService.currentUser;
   
   tasks: Task[] = [];
   loading = false;
@@ -29,20 +33,48 @@ export class TaskListComponent implements OnInit {
   editingTask: Task | null = null;
 
   ngOnInit() {
+    console.log('TaskList component initialized');
+    console.log('Current user:', this.currentUser());
+    console.log('Is authenticated:', this.authService.isAuthenticated());
+    console.log('Token:', this.authService.getToken());
+    
     this.loadTasks();
   }
 
   loadTasks() {
+    console.log('Loading tasks...');
     this.loading = true;
+    this.error = '';
+    this.cdr.detectChanges(); // Force update
+    
     this.taskService.getTasks().subscribe({
       next: (tasks) => {
+        console.log('Tasks loaded successfully:', tasks);
         this.tasks = tasks;
         this.loading = false;
+        console.log('Loading state:', this.loading);
+        console.log('Tasks array:', this.tasks);
+        console.log('Tasks length:', this.tasks.length);
+        this.cdr.detectChanges(); // Force update after loading
       },
       error: (err) => {
-        this.error = 'Failed to load tasks. Make sure the backend is running.';
+        console.error('Error loading tasks:', err);
+        console.error('Error status:', err.status);
+        console.error('Error message:', err.message);
+        console.error('Error details:', err.error);
+        
         this.loading = false;
-        console.error(err);
+        
+        if (err.status === 401) {
+          this.error = 'Session expired. Please login again.';
+          this.authService.logout();
+        } else if (err.status === 0) {
+          this.error = 'Cannot connect to backend. Please check if it\'s running.';
+        } else {
+          this.error = 'Failed to load tasks. Please try again.';
+        }
+        
+        this.cdr.detectChanges(); // Force update on error
       }
     });
   }
@@ -56,10 +88,12 @@ export class TaskListComponent implements OnInit {
       next: (task) => {
         this.tasks.push(task);
         this.resetForm();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Failed to create task';
         console.error(err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -73,10 +107,12 @@ export class TaskListComponent implements OnInit {
         if (index !== -1) {
           this.tasks[index] = updated;
         }
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Failed to update task';
         console.error(err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -89,10 +125,12 @@ export class TaskListComponent implements OnInit {
     this.taskService.deleteTask(id).subscribe({
       next: () => {
         this.tasks = this.tasks.filter(t => t.id !== id);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.error = 'Failed to delete task';
         console.error(err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -116,5 +154,9 @@ export class TaskListComponent implements OnInit {
 
   getTasksByStatus(status: string) {
     return this.tasks.filter(t => t.status === status);
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }
