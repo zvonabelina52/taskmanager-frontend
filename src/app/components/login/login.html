@@ -1,98 +1,103 @@
 <div class="login-container">
+
+<div class="login-container">
   <div class="login-card">
     <div class="login-header">
       <h1>📋 Task Manager</h1>
       <p>{{ isLoginMode ? 'Welcome back!' : 'Create your account' }}</p>
     </div>
 
-    <div class="error" *ngIf="error">
-      {{ error }}
-    </div>
+    @if (error()) {
+  <div class="error">{{ error() }}</div>
+}
 
-    <!-- Login Form -->
-    <form *ngIf="isLoginMode" (ngSubmit)="onLogin()">
-      <div class="form-group">
-        <label for="login-username">Username</label>
-        <input 
-          type="text" 
-          id="login-username" 
-          [(ngModel)]="loginData.username" 
-          name="username"
-          placeholder="Enter your username"
-          required
-          [disabled]="loading">
-      </div>
+    <form (ngSubmit)="isLoginMode ? onLogin() : onRegister()" #authForm="ngForm">
+      @if (isLoginMode) {
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input
+            id="login-username"
+            type="text"
+            name="username"
+            [(ngModel)]="loginData.username"
+            placeholder="Enter your username"
+            [disabled]="loading"
+            required
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="login-password">Password</label>
-        <input 
-          type="password" 
-          id="login-password" 
-          [(ngModel)]="loginData.password" 
-          name="password"
-          placeholder="Enter your password"
-          required
-          [disabled]="loading">
-      </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input
+            id="login-password"
+            type="password"
+            name="password"
+            [(ngModel)]="loginData.password"
+            placeholder="Enter your password"
+            [disabled]="loading"
+            required
+          />
+        </div>
+      }
 
-      <button type="submit" class="btn btn-primary" [disabled]="loading">
-        {{ loading ? 'Logging in...' : 'Login' }}
-      </button>
-    </form>
+      @if (!isLoginMode) {
+        <div class="form-group">
+          <label for="register-username">Username</label>
+          <input
+            id="register-username"
+            type="text"
+            name="username"
+            [(ngModel)]="registerData.username"
+            placeholder="Choose a username"
+            [disabled]="loading"
+            required
+          />
+        </div>
 
-    <!-- Register Form -->
-    <form *ngIf="!isLoginMode" (ngSubmit)="onRegister()">
-      <div class="form-group">
-        <label for="register-username">Username</label>
-        <input 
-          type="text" 
-          id="register-username" 
-          [(ngModel)]="registerData.username" 
-          name="username"
-          placeholder="Choose a username"
-          required
-          [disabled]="loading">
-      </div>
+        <div class="form-group">
+          <label for="register-email">Email</label>
+          <input
+            id="register-email"
+            type="email"
+            name="email"
+            [(ngModel)]="registerData.email"
+            placeholder="Enter your email"
+            [disabled]="loading"
+            required
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="register-email">Email</label>
-        <input 
-          type="email" 
-          id="register-email" 
-          [(ngModel)]="registerData.email" 
-          name="email"
-          placeholder="Enter your email"
-          required
-          [disabled]="loading">
-      </div>
+        <div class="form-group">
+          <label for="register-password">Password</label>
+          <input
+            id="register-password"
+            type="password"
+            name="password"
+            [(ngModel)]="registerData.password"
+            placeholder="Choose a password (min 6 characters)"
+            [disabled]="loading"
+            required
+          />
+        </div>
+      }
 
-      <div class="form-group">
-        <label for="register-password">Password</label>
-        <input 
-          type="password" 
-          id="register-password" 
-          [(ngModel)]="registerData.password" 
-          name="password"
-          placeholder="Choose a password (min 6 characters)"
-          required
-          minlength="6"
-          [disabled]="loading">
-      </div>
-
-      <button type="submit" class="btn btn-primary" [disabled]="loading">
-        {{ loading ? 'Creating account...' : 'Create Account' }}
+      <button type="submit" class="btn btn-primary" [disabled]="loading || !authForm.valid">
+        {{ loading ? 'Processing...' : isLoginMode ? 'Login' : 'Create Account' }}
       </button>
     </form>
 
     <div class="toggle-mode">
-      <p *ngIf="isLoginMode">
-        Don't have an account? 
-        <a (click)="toggleMode()">Create one</a>
-      </p>
-      <p *ngIf="!isLoginMode">
-        Already have an account? 
-        <a (click)="toggleMode()">Login</a>
-      </p>
+      @if (isLoginMode) {
+        <p>
+          Don't have an account?
+          <a (click)="toggleMode()">Create one</a>
+        </p>
+      } @else {
+        <p>
+          Already have an account?
+          <a (click)="toggleMode()">Login</a>
+        </p>
+      }
     </div>
   </div>
 </div>

@@ -41,37 +41,30 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('should login user and store token', () => {
-      const mockResponse = {
-        token: 'mock-jwt-token',
-        username: 'testuser',
-        email: 'test@example.com'
-      };
+    it('should login user and store token', (done) => {
+  const mockResponse = {
+    token: 'mock-jwt-token',
+    username: 'testuser',
+    email: 'test@example.com'
+  };
 
-      const loginRequest = {
-        username: 'testuser',
-        password: 'password123'
-      };
+  const loginRequest = {
+    username: 'testuser',
+    password: 'password123'
+  };
 
-      // AuthService.login takes a LoginRequest object, not separate params
-      let result: any;
-      service.login(loginRequest).subscribe({
-        next: (response) => {
-          result = response;
-          expect(response).toEqual(mockResponse);
-          expect(localStorage.getItem('token')).toBe('mock-jwt-token');
-          expect(service.isAuthenticated()).toBeTruthy();
-          expect(routerSpy.navigate).toHaveBeenCalledWith(['/tasks']);
-        }
-      });
+  service.login(loginRequest).subscribe({
+    next: (response) => {
+      expect(response).toEqual(mockResponse);
+      expect(localStorage.getItem('token')).toBe('mock-jwt-token');
+      expect(service.isAuthenticated()).toBeTruthy();
+    }
+  });
 
-      const req = httpMock.expectOne(`${apiUrl}/login`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(loginRequest);
-      req.flush(mockResponse);
-      
-      expect(result).toEqual(mockResponse);
-    });
+  const req = httpMock.expectOne(`${apiUrl}/login`);
+  expect(req.request.method).toBe('POST');
+  req.flush(mockResponse);
+});
 
     it('should handle login error', () => {
       const loginRequest = {

@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Router } from '@angular/router';
-
 import { authGuard } from './auth.guard';
 import { AuthService } from '../services/auth.service';
 
@@ -29,7 +28,7 @@ describe('authGuard', () => {
   it('should allow navigation when user is authenticated', () => {
     authServiceMock.isAuthenticated.mockReturnValue(true);
 
-    const result = authGuard();
+    const result = TestBed.runInInjectionContext(() => authGuard());
 
     expect(result).toBe(true);
     expect(routerMock.navigate).not.toHaveBeenCalled();
@@ -38,7 +37,7 @@ describe('authGuard', () => {
   it('should redirect to /login when user is not authenticated', () => {
     authServiceMock.isAuthenticated.mockReturnValue(false);
 
-    const result = authGuard();
+    const result = TestBed.runInInjectionContext(() => authGuard());
 
     expect(result).toBe(false);
     expect(routerMock.navigate).toHaveBeenCalledWith(['/login']);

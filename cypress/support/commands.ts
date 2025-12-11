@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
 
-// Extend Cypress Chainable interface
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -8,24 +7,22 @@ declare global {
        * Custom command to login a user
        * @example cy.login('username', 'password')
        */
-      login(username: string, password: string): Chainable<void>;
-      
+      login(username: string, password: string): Chainable;
+
       /**
        * Custom command to register a new user
        * @example cy.register('username', 'email@test.com', 'password')
        */
-      register(username: string, email: string, password: string): Chainable<void>;
-      
+      register(username: string, email: string, password: string): Chainable;
+
       /**
        * Custom command to create a task
        * @example cy.createTask('Task Title', 'Task Description', 'HIGH')
        */
-      createTask(title: string, description: string, priority?: string): Chainable<void>;
+      createTask(title: string, description: string, priority?: string): Chainable;
     }
   }
 }
-
-// Import commands.js using ES2015 syntax to ensure it's loaded
 
 Cypress.Commands.add('login', (username: string, password: string) => {
   cy.visit('/login');
@@ -36,20 +33,30 @@ Cypress.Commands.add('login', (username: string, password: string) => {
 });
 
 Cypress.Commands.add('register', (username: string, email: string, password: string) => {
-  cy.visit('/register');
+  cy.visit('/login');
+  
+  // Click "Create one" link to switch to register mode
+  cy.contains('a', 'Create one').click();
+  
+  // Verify we're in register mode
+  cy.contains('Create your account').should('be.visible');
+  
   cy.get('input[name="username"]').type(username);
   cy.get('input[name="email"]').type(email);
   cy.get('input[name="password"]').type(password);
   cy.get('button[type="submit"]').click();
+  
   cy.url().should('include', '/tasks');
 });
 
 Cypress.Commands.add('createTask', (title: string, description: string, priority: string = 'MEDIUM') => {
   cy.contains('button', 'New Task').click();
-  cy.get('[data-cy="task-title"]').type(title);
-  cy.get('[data-cy="task-description"]').type(description);
+  
+  cy.get('input[placeholder*="Task title"]').type(title);
+  cy.get('textarea[placeholder*="Task description"]').type(description);
   cy.get('select[name="priority"]').select(priority);
-  cy.get('[data-cy="save-task-btn"]').click();
+  
+  cy.get('button[type="submit"]').click();
 });
 
 export {};
